@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:story_app/data/model/parameters/login_params.dart';
+import 'package:story_app/provider/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -72,22 +75,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // TODO: Handle API for login
-                        },
-                        child: const Text("Login"),
-                      ),
-                    ),
+                    context.watch<LoginProvider>().isLoading
+                        ? const CircularProgressIndicator()
+                        : SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await _loginButtonTapped();
+                              },
+                              child: const Text("Login"),
+                            ),
+                          ),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () async {
                           final String? result =
                               await context.push("/register");
-                          if (result != null && result.isNotEmpty && context.mounted) {
+                          if (result != null &&
+                              result.isNotEmpty &&
+                              context.mounted) {
                             final ScaffoldMessengerState
                                 scaffoldMessengerState =
                                 ScaffoldMessenger.of(context);
@@ -108,5 +115,22 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       )),
     );
+  }
+
+  _loginButtonTapped() async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    final params = LoginParams(
+        email: emailController.text, password: passwordController.text);
+    final provider = context.read<LoginProvider>();
+    final result = await provider.doLogin(params);
+
+    if (result && context.mounted) {
+      context.go("/");
+    } else {
+      scaffoldMessengerState.showSnackBar(
+        SnackBar(content: Text(provider.message)),
+      );
+    }
   }
 }

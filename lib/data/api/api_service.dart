@@ -9,13 +9,17 @@ class ApiService {
   final endpoint = "https://story-api.dicoding.dev/v1";
 
   Future<LoginResponse> login(LoginParams params) async {
-    final response =
-        await http.post(Uri.parse("$endpoint/login"), body: params.toJson());
+    final response = await http.post(Uri.parse("$endpoint/login"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: params.toJson());
 
     if (response.statusCode == 200) {
       return LoginResponse.fromJson(response.body);
     } else {
-      throw Exception("Failed to login");
+      final message = ErrorResponse.fromJson(response.body);
+      throw Exception(message.message ?? "Unknonw error");
     }
   }
 

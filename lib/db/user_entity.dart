@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:story_app/data/model/login_response.dart';
-
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class UserEntity {
@@ -24,11 +22,6 @@ class UserEntity {
   }
 
   String toJson() => json.encode(toMap());
-
-  factory UserEntity.toUser(LoginResponse response) => UserEntity(
-      userId: response.loginResult?.userId ?? "",
-      name: response.loginResult?.name ?? "",
-      token: response.loginResult?.token ?? "");
 
   factory UserEntity.fromMap(Map<String, dynamic> map) {
     return UserEntity(

@@ -1,14 +1,20 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/data/api/api_service.dart';
+import 'package:story_app/db/auth_repository.dart';
+import 'package:story_app/provider/login_provider.dart';
 import 'package:story_app/provider/register_provider.dart';
 import 'package:story_app/routes/router_config.dart';
 
 void main() {
+  late ApiService apiService = ApiService();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => RegisterProvider(ApiService()))
+        ChangeNotifierProvider(create: (context) => RegisterProvider(apiService)),
+        ChangeNotifierProvider(create: (context) => LoginProvider(apiService, AuthRepository()))
       ],
       child: const StoriesApp(),
     ),
