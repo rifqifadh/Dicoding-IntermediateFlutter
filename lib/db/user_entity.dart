@@ -25,7 +25,7 @@ class UserEntity {
 
   String toJson() => json.encode(toMap());
 
-  UserEntity toUser(LoginResponse response) => UserEntity(
+  factory UserEntity.toUser(LoginResponse response) => UserEntity(
       userId: response.loginResult?.userId ?? "",
       name: response.loginResult?.name ?? "",
       token: response.loginResult?.token ?? "");

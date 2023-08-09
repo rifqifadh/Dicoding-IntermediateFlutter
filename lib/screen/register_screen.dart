@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:story_app/data/model/parameters/register_params.dart';
+import 'package:story_app/provider/register_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -80,24 +84,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final form = formKey.currentState;
-                        if (form!.validate()) {
-                          // TODO: Handle API for register
-                        }
-                      },
-                      child: const Text("Daftar"),
-                    ),
-                  ),
+                  context.watch<RegisterProvider>().isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final form = formKey.currentState;
+                              if (form!.validate()) {
+                                await _registerButtonTapped();
+                              }
+                            },
+                            child: const Text("Daftar"),
+                          ),
+                        ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
+  }
+
+  _registerButtonTapped() async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    final params = RegisterParams(
+        name: nameController.text,
+        email: emailController.text,
+        password: passwordController.text);
+    final provider = context.read<RegisterProvider>();
+    final result = await provider.register(params);
+
+    if (result && context.mounted) {
+      context.pop('User berhasil dibuat');
+    } else {
+      scaffoldMessengerState.showSnackBar(
+        SnackBar(content: Text(provider.message)),
+      );
+    }
   }
 }

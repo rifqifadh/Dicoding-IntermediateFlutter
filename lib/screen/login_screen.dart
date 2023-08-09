@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,7 +30,6 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
@@ -85,7 +85,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () async {
-                          // TODO: Navigate into RegisterScreen
+                          final String? result =
+                              await context.push("/register");
+                          if (result != null && result.isNotEmpty && context.mounted) {
+                            final ScaffoldMessengerState
+                                scaffoldMessengerState =
+                                ScaffoldMessenger.of(context);
+                            scaffoldMessengerState.showSnackBar(
+                              SnackBar(content: Text(result)),
+                            );
+                          }
                         },
                         child: const Text("Daftar"),
                       ),
