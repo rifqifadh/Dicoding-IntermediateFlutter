@@ -24,7 +24,6 @@ class AuthRepository {
 
   Future<bool> saveUser(UserEntity user) async {
     final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
     return preferences.setString(userKey, user.toJson());
   }
 

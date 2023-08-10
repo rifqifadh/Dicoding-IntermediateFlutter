@@ -26,13 +26,14 @@ class LoginProvider extends ChangeNotifier {
       response = await apiService.login(params);
       if (response?.loginResult != null) {
         final result = response?.loginResult;
-        authRepository.saveUser(
+        final success = await authRepository.saveUser(
           UserEntity(
             name: result?.name ?? "",
             userId: result?.userId ?? "",
             token: result?.token ?? "",
           ),
         );
+        if (success) authRepository.login();
       }
       isLoading = false;
 

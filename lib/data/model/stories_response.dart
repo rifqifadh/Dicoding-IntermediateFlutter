@@ -2,12 +2,12 @@
 
 import 'dart:convert';
 
-import 'package:story_app/data/model/story_response.dart';
+import 'package:story_app/data/model/story_model.dart';
 
 class StoriesResponse {
   final bool error;
   final String? message;
-  final List<StoryResponse>? listStory;
+  final List<Story>? listStory;
 
   StoriesResponse({
     required this.error,
@@ -18,17 +18,10 @@ class StoriesResponse {
   factory StoriesResponse.fromMap(Map<String, dynamic> map) {
     return StoriesResponse(
       error: map['error'] as bool,
-      message: map['message'] != null ? map['message'] as String : "",
-      listStory: map['listStory'] != null
-          ? List<StoryResponse>.from(
-              (map['listStory'] as List<int>).map<StoryResponse?>(
-                (x) => StoryResponse.fromMap(x as Map<String, dynamic>),
-              ),
-            )
-          : [],
+      message: map['message'] != null ? map['message'] as String : null,
+      listStory: map['listStory'] != null ? List<Story>.from((map['listStory'] as List<dynamic>).map<Story?>((x) => Story.fromMap(x as Map<String,dynamic>),),) : null,
     );
   }
 
-  factory StoriesResponse.fromJson(String source) =>
-      StoriesResponse.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory StoriesResponse.fromJson(String source) => StoriesResponse.fromMap(json.decode(source) as Map<String, dynamic>);
 }
