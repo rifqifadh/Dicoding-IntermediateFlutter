@@ -16,7 +16,9 @@ class AuthRepository {
 
   Future<bool> logout() async {
     final preferences = await SharedPreferences.getInstance();
-    return preferences.setBool(stateKey, false);
+    final isLoggedOut = await preferences.setBool(stateKey, false);
+    final isUserDeleted = await deleteUser();
+    return isLoggedOut && isUserDeleted;
   }
 
   /// todo 4: add user manager to handle user information like email and password

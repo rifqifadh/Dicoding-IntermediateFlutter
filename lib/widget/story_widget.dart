@@ -10,7 +10,7 @@ class StoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -35,7 +35,7 @@ class StoryWidget extends StatelessWidget {
               children: [
                 Text(
                   "created by: ${story.name}",
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
                 const SizedBox(
                   height: 8,
