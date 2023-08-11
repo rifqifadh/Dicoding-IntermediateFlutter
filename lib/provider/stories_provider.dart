@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:story_app/data/api/api_service.dart';
 import 'package:story_app/data/model/stories_response.dart';
+import 'package:story_app/data/model/story_model.dart';
 
 class StoriesProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -25,10 +26,13 @@ class StoriesProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      // print(e.toString());
       isLoading = false;
       message = e.toString();
       notifyListeners();
     }
+  }
+
+  Future<void> addStory(Story story) async {
+    if(stories?.listStory != null) stories?.listStory?.insert(0, story);
   }
 }

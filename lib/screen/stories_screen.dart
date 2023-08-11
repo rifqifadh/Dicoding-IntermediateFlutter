@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:story_app/db/auth_repository.dart';
+import 'package:story_app/provider/auth_provider.dart';
 import 'package:story_app/provider/stories_provider.dart';
 import 'package:story_app/widget/story_widget.dart';
 
@@ -13,8 +13,7 @@ class StoriesScreen extends StatefulWidget {
 }
 
 class _StoriesScreenState extends State<StoriesScreen> {
-
-  final AuthRepository authRepository = AuthRepository();
+  bool isLoggingOut = false;
 
   @override
   void initState() {
@@ -24,17 +23,17 @@ class _StoriesScreenState extends State<StoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Developer Stories"),
         actions: <Widget>[
           Padding(
-            padding: EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: 20),
             child: GestureDetector(
               onTap: () async {
-                final loggedOut = await authRepository.logout();
-                if (loggedOut && context.mounted) {
+                final provider = context.read<AuthProvider>();
+                final isLoggedOut = await provider.logout();
+                if (isLoggedOut && context.mounted) {
                   context.go('/login');
                 }
               },
@@ -57,18 +56,30 @@ class _StoriesScreenState extends State<StoriesScreen> {
           return ListView.builder(
             itemCount: stories.length,
             itemBuilder: (context, index) {
-              return StoryWidget(story: stories[index]);
+              return InkWell(child:  StoryWidget(story: stories[index]), onTap: () {
+                context.push('/detail', extra: stories[index]);
+              },);
             },
           );
         },
       ),
-      // floatingActionButton: ,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final bool success = await context.push<bool>("/add-story") ?? false;
+          
+          if(success == true && context.mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            context.read<StoriesProvider>().fetchStories();
+            });
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   fetchStories() async {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // Provider.of<StoriesProvider>(context, listen: false).fetchStories();
       context.read<StoriesProvider>().fetchStories();
     });
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/data/model/parameters/login_params.dart';
+import 'package:story_app/provider/auth_provider.dart';
 import 'package:story_app/provider/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email.';
                         }
+                        if (value.length < 8) { return "Password harus lebih dari 8 karakter"; }
                         return null;
                       },
                       decoration: const InputDecoration(
@@ -81,7 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () async {
-                                await _loginButtonTapped();
+                                final form = formKey.currentState;
+                                if (form!.validate()) {
+                                  await _loginButtonTapped();
+                                }
                               },
                               child: const Text("Login"),
                             ),
@@ -123,7 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final params = LoginParams(
         email: emailController.text, password: passwordController.text);
     final provider = context.read<LoginProvider>();
+    final authProvider = context.read<AuthProvider>();
     final result = await provider.doLogin(params);
+    authProvider.successLogin();
 
     if (result && context.mounted) {
       context.go("/");

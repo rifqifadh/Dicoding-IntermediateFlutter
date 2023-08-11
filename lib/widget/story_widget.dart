@@ -40,7 +40,11 @@ class StoryWidget extends StatelessWidget {
                 const SizedBox(
                   height: 8,
                 ),
-                Text(story.description),
+                Text(
+                  story.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
