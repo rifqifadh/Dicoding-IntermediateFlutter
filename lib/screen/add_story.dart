@@ -28,85 +28,87 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Story"),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 250,
-            child: ClipRRect(
-              child: context.watch<AddStoryProvider>().imagePath == null
-                  ? const Align(
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.image,
-                        size: 100,
-                      ),
-                    )
-                  : showImage(),
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        appBar: AppBar(
+          title: const Text("Add Story"),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ElevatedButton(
-                onPressed: () => onGaleryView(),
-                child: const Text("Gallery"),
+              SizedBox(
+                width: double.infinity,
+                height: 250,
+                child: ClipRRect(
+                  child: context.watch<AddStoryProvider>().imagePath == null
+                      ? const Align(
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image,
+                            size: 100,
+                          ),
+                        )
+                      : showImage(),
+                ),
               ),
-              ElevatedButton(
-                onPressed: () => onCameraView(),
-                child: const Text("Camera"),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => onGaleryView(),
+                    child: const Text("Gallery"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => onCameraView(),
+                    child: const Text("Camera"),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: formKey,
+                  child: TextFormField(
+                    controller: storyController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Story tidak boleh kosong.';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: "Masukkan Developer story",
+                    ),
+                  ),
+                ),
+              ),
+              
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: context.watch<UploadProvider>().isUploading
+                    ? const SizedBox(
+                    height: 24.0,
+                    width: 18.0,
+                    child: Center(
+                      child: CircularProgressIndicator()
+                    ),
+                  )
+                    : ElevatedButton(
+                        onPressed: () {
+                          final form = formKey.currentState;
+                          if (form!.validate()) {
+                            onUploadButtonTapped();
+                          }
+                        },
+                        child: const Text("Upload Story"),
+                      ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: formKey,
-              child: TextFormField(
-                controller: storyController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Story tidak boleh kosong.';
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  hintText: "Masukkan Developer story",
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: context.watch<UploadProvider>().isUploading
-                ? const SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(),
-                  )
-                : ElevatedButton(
-                    onPressed: () {
-                      final form = formKey.currentState;
-                      if (form!.validate()) {
-                        onUploadButtonTapped();
-                      }
-                    },
-                    child: const Text("Upload Story"),
-                  ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   onUploadButtonTapped() async {
-    final ScaffoldMessengerState scaffoldMessengerState =
-        ScaffoldMessenger.of(context);
     final uploadProvider = context.read<UploadProvider>();
 
     final addStoryProvider = context.read<AddStoryProvider>();
@@ -122,13 +124,11 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     await uploadProvider.upload(
         compressedImage, fileName, storyController.text);
 
-    scaffoldMessengerState
-        .showSnackBar(SnackBar(content: Text(uploadProvider.message)))
-        .closed
-        .then((value) => {
-              if (uploadProvider.uploadResponse != null && context.mounted)
-                {context.pop(true)}
-            });
+    if (uploadProvider.uploadResponse != null && context.mounted) {
+      addStoryProvider.imagePath = null;
+      addStoryProvider.imageFile = null;
+      context.pop(true);
+    }
   }
 
   onGaleryView() async {

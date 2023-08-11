@@ -65,9 +65,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
           final bool success = await context.push<bool>("/add-story") ?? false;
           
           if(success == true && context.mounted) {
+            scaffoldMessengerState.showSnackBar(const SnackBar(content: Text('Sukses menambahkan story')));
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             context.read<StoriesProvider>().fetchStories();
             });

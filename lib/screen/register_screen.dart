@@ -18,6 +18,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final formKey = GlobalKey<FormState>();
 
+  bool passwordVisible = false;
+
+  @override
+  void initState() {
+    passwordVisible = false;
+    super.initState();
+  }
+
   @override
   void dispose() {
     emailController.dispose();
@@ -29,6 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text("Daftar Akun"),
       ),
@@ -79,9 +88,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       }
                       return null;
                     },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "Password",
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            passwordVisible = !passwordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
                     ),
+                    obscureText: !passwordVisible,
                   ),
                   const SizedBox(height: 8),
                   context.watch<RegisterProvider>().isLoading
