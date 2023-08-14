@@ -12,6 +12,8 @@ Story _$StoryFromJson(Map<String, dynamic> json) => Story(
       description: json['description'] as String,
       photoUrl: json['photoUrl'] as String,
       createdAt: json['createdAt'] as String,
+      lat: json['lat'] as double?,
+      lon: json['lon'] as double?,
     );
 
 Map<String, dynamic> _$StoryToJson(Story instance) => <String, dynamic>{
@@ -20,4 +22,6 @@ Map<String, dynamic> _$StoryToJson(Story instance) => <String, dynamic>{
       'description': instance.description,
       'photoUrl': instance.photoUrl,
       'createdAt': instance.createdAt,
+      'lat': instance.lat,
+      'lon': instance.lon,
     };
