@@ -16,5 +16,5 @@ class RegisterResponse {
     );
   }
 
-  factory RegisterResponse.fromJson(json) => _$RegisterResponseFromJson(json);
+  factory RegisterResponse.fromJson(Map<String, dynamic> json) => _$RegisterResponseFromJson(json);
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -22,9 +23,9 @@ class ApiService {
         body: params.toJson());
 
     if (response.statusCode == 200) {
-      return LoginResponse.fromJson(response.body);
+      return LoginResponse.fromJson(jsonDecode(response.body));
     } else {
-      final message = ErrorResponse.fromJson(response.body);
+      final message = ErrorResponse.fromJson(jsonDecode(response.body));
       throw Exception(message.message ?? "Unknonw error");
     }
   }
@@ -37,14 +38,14 @@ class ApiService {
         body: params.toJson());
 
     if (response.statusCode == 201) {
-      return RegisterResponse.fromJson(response.body);
+      return RegisterResponse.fromJson(jsonDecode(response.body));
     } else {
-      final message = ErrorResponse.fromJson(response.body);
+      final message = ErrorResponse.fromJson(jsonDecode(response.body));
       throw Exception(message.message ?? "Unknonw error");
     }
   }
 
-  Future<StoriesResponse> getStories({int page = 1, int size = 10}) async {
+  Future<StoriesResponse> getStories({int? page = 1, int size = 10}) async {
     final user = await authRepository.getUser();
     final response = await http.get(
       Uri.parse(
@@ -57,9 +58,9 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      return StoriesResponse.fromJson(response.body);
+      return StoriesResponse.fromJson(jsonDecode(response.body));
     } else {
-      final message = ErrorResponse.fromJson(response.body);
+      final message = ErrorResponse.fromJson(jsonDecode(response.body));
       throw Exception(message.message ?? "Unknonw error");
     }
   }

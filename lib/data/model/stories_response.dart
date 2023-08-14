@@ -15,5 +15,5 @@ class StoriesResponse {
     this.listStory,
   });
 
-  factory StoriesResponse.fromJson(json) => _$StoriesResponseFromJson(json);
+  factory StoriesResponse.fromJson(Map<String, dynamic> json) => _$StoriesResponseFromJson(json);
 }

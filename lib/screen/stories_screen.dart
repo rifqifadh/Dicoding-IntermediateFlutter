@@ -13,12 +13,29 @@ class StoriesScreen extends StatefulWidget {
 }
 
 class _StoriesScreenState extends State<StoriesScreen> {
+  final ScrollController scrollController = ScrollController();
   bool isLoggingOut = false;
 
   @override
   void initState() {
     super.initState();
-    fetchStories();
+    final provider = context.read<StoriesProvider>();
+
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent) {
+        if (provider.page != null) {
+          fetchStories();
+        }
+      }
+    });
+    Future.microtask(() async => fetchStories());
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,32 +64,56 @@ class _StoriesScreenState extends State<StoriesScreen> {
       ),
       body: Consumer<StoriesProvider>(
         builder: (context, value, child) {
-          if (value.isLoading) {
+          final state = value.storiesState;
+          return state.map(initial: (value) {
+            return const Center(
+              child: Text("No data"),
+            );
+          }, loading: (value) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          }
-          final stories = value.stories?.listStory ?? [];
-          return ListView.builder(
-            itemCount: stories.length,
-            itemBuilder: (context, index) {
-              return InkWell(child:  StoryWidget(story: stories[index]), onTap: () {
-                context.push('/detail', extra: stories[index]);
-              },);
-            },
-          );
+          }, loaded: (valueCase) {
+            final stories = value.stories;
+            return ListView.builder(
+              controller: scrollController,
+              itemCount: stories.length + (value.page != null ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == stories.length  && value.page != null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                return InkWell(
+                  child: StoryWidget(story: stories[index]),
+                  onTap: () {
+                    context.push('/detail', extra: stories[index]);
+                  },
+                );
+              },
+            );
+          }, error: (value) {
+            final message = value.message;
+            return Center(
+              child: Text(message),
+            );
+          });
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final ScaffoldMessengerState scaffoldMessengerState =
-        ScaffoldMessenger.of(context);
+              ScaffoldMessenger.of(context);
           final bool success = await context.push<bool>("/add-story") ?? false;
-          
-          if(success == true && context.mounted) {
-            scaffoldMessengerState.showSnackBar(const SnackBar(content: Text('Sukses menambahkan story')));
+
+          if (success == true && context.mounted) {
+            scaffoldMessengerState.showSnackBar(
+                const SnackBar(content: Text('Sukses menambahkan story')));
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            context.read<StoriesProvider>().fetchStories();
+              context.read<StoriesProvider>().fetchStories();
             });
           }
         },
