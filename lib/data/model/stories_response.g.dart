@@ -13,10 +13,3 @@ StoriesResponse _$StoriesResponseFromJson(Map<String, dynamic> json) =>
       listStory:
           (json['listStory'] as List<dynamic>?)?.map(Story.fromJson).toList(),
     );
-
-Map<String, dynamic> _$StoriesResponseToJson(StoriesResponse instance) =>
-    <String, dynamic>{
-      'error': instance.error,
-      'message': instance.message,
-      'listStory': instance.listStory,
-    };

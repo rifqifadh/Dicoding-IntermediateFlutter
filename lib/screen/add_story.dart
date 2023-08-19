@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/provider/add_story_provider.dart';
-import 'package:story_app/provider/upload_provider.dart';
+import 'package:story_app/provider/map_provider.dart';
+import 'package:story_app/widget/add_story_map_widget.dart';
 
 class AddStoryScreen extends StatefulWidget {
+
   const AddStoryScreen({super.key});
 
   @override
@@ -82,17 +84,33 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                   ),
                 ),
               ),
-              
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text("Posting story from: "),
+              ),
               Padding(
-                padding: const EdgeInsets.all(16),
-                child: context.watch<UploadProvider>().isUploading
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: SizedBox(
+                  height: 250,
+                  child:
+                      Consumer<MapProvider>(builder: (context, value, child) {
+                    if (value.position != null) {
+                      return const AddStoryMapWidget();
+                    } else {
+                      return const Text("Location unknown");
+                    }
+                  }),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 32),
+                child: context.watch<AddStoryProvider>().isUploading
                     ? const SizedBox(
-                    height: 24.0,
-                    width: 18.0,
-                    child: Center(
-                      child: CircularProgressIndicator()
-                    ),
-                  )
+                        height: 24.0,
+                        width: 18.0,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
                     : ElevatedButton(
                         onPressed: () {
                           final form = formKey.currentState;
@@ -109,22 +127,12 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   }
 
   onUploadButtonTapped() async {
-    final uploadProvider = context.read<UploadProvider>();
-
+    final mapProvider = context.read<MapProvider>();
     final addStoryProvider = context.read<AddStoryProvider>();
-    final imagePath = addStoryProvider.imagePath;
-    final imageFile = addStoryProvider.imageFile;
-    if (imagePath == null || imageFile == null) return;
 
-    final fileName = imageFile.name;
-    final bytes = await imageFile.readAsBytes();
+    await addStoryProvider.upload(storyController.text, mapProvider.position);
 
-    final compressedImage = await uploadProvider.compressImage(bytes);
-
-    await uploadProvider.upload(
-        compressedImage, fileName, storyController.text);
-
-    if (uploadProvider.uploadResponse != null && context.mounted) {
+    if (context.mounted) {
       addStoryProvider.imagePath = null;
       addStoryProvider.imageFile = null;
       context.pop(true);

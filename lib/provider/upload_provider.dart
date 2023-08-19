@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:story_app/data/api/api_service.dart';
 import 'package:story_app/data/model/add_story.dart';
 import 'package:image/image.dart' as img;
+import 'package:story_app/data/model/parameters/add_story_params.dart';
 
 class UploadProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -15,9 +16,7 @@ class UploadProvider extends ChangeNotifier {
   UploadResponse? uploadResponse;
 
   Future<void> upload(
-    List<int> bytes,
-    String fileName,
-    String description,
+    AddStoryRequestModel data
   ) async {
     try {
       message = "";
@@ -26,7 +25,7 @@ class UploadProvider extends ChangeNotifier {
       notifyListeners();
 
       uploadResponse =
-          await apiService.uploadFile(bytes, fileName, description);
+          await apiService.uploadFile(data);
       message = uploadResponse?.message ?? "success";
       isUploading = false;
       notifyListeners();

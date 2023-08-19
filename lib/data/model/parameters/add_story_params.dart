@@ -1,32 +1,30 @@
-import 'dart:convert';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+class AddStoryRequestModel {
+  final String description;
+  final String fileName;
+  final List<int> bytes;
+  final double? lat;
+  final double? lon;
 
-
-class AddStoryParams {
-    String fileName;
-    String description;
-
-  AddStoryParams({
-    required this.fileName,
+  AddStoryRequestModel({
     required this.description,
+    required this.fileName,
+    required this.bytes,
+    this.lat,
+    this.lon,
   });
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'fileName': fileName,
-      'description': description,
+  Map<String, String> toJson() {
+    if (lat == null && lon == null) {
+      return {
+        "description": description,
+      };
+    }
+
+    return {
+      "description": description,
+      "lat": lat?.toString() ?? "",
+      "lon": lon?.toString() ?? "",
     };
   }
-
-  factory AddStoryParams.fromMap(Map<String, dynamic> map) {
-    return AddStoryParams(
-      fileName: map['fileName'] as String,
-      description: map['description'] as String,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory AddStoryParams.fromJson(String source) => AddStoryParams.fromMap(json.decode(source) as Map<String, dynamic>);
 }

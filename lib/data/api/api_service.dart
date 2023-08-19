@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:story_app/data/model/add_story.dart';
 import 'package:story_app/data/model/error_response.dart';
 import 'package:story_app/data/model/login_response.dart';
+import 'package:story_app/data/model/parameters/add_story_params.dart';
 import 'package:story_app/data/model/parameters/login_params.dart';
 import 'package:story_app/data/model/parameters/register_params.dart';
 import 'package:story_app/data/model/register_response.dart';
@@ -66,16 +67,16 @@ class ApiService {
   }
 
   Future<UploadResponse> uploadFile(
-    List<int> bytes,
-    String fileName,
-    String description,
+    AddStoryRequestModel data,
   ) async {
     var request = http.MultipartRequest('POST', Uri.parse("$endpoint/stories"));
     final user = await authRepository.getUser();
-    final multiPartFile =
-        http.MultipartFile.fromBytes("photo", bytes, filename: fileName);
+    final multiPartFile = http.MultipartFile.fromBytes("photo", data.bytes,
+        filename: data.fileName);
     final Map<String, String> fields = {
-      "description": description,
+      "description": data.description,
+      "lat": "${data.lat?.toDouble()}",
+      "lon": "${data.lon?.toDouble()}"
     };
     final Map<String, String> headers = {
       "Content-type": "multipart/form-data",
@@ -91,10 +92,10 @@ class ApiService {
 
     final Uint8List responseList = await streamedResponse.stream.toBytes();
     final String responseData = String.fromCharCodes(responseList);
-
+    
     if (statusCode == 201) {
       final UploadResponse uploadResponse = UploadResponse.fromJson(
-        responseData,
+        jsonDecode(responseData),
       );
       return uploadResponse;
     } else {

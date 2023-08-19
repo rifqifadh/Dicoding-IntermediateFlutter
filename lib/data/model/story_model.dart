@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:json_annotation/json_annotation.dart';
 
 part 'story_model.g.dart';
@@ -10,8 +9,8 @@ class Story {
   final String description;
   final String photoUrl;
   final String createdAt;
-  final double? lat;
-  final double? lon;
+  final num? lat;
+  final num? lon;
   
   Story({
     required this.id,
